@@ -7,8 +7,9 @@ import connectData from 'helpers/connectData';
 import { login } from 'redux/modules/currentUser';
 import { load as loadSurveys } from 'redux/modules/surveys';
 
-function fetchData() {
-  return Promise.resolve();
+function fetchData(getState, dispatch) {
+  const token = getState().currentUser.token;
+  return token ? dispatch(loadSurveys()) : Promise.resolve();
 }
 
 @connectData(fetchData)

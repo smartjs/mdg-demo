@@ -11,6 +11,7 @@ import ApiClient from './helpers/ApiClient';
 import Html from './helpers/Html';
 import PrettyError from 'pretty-error';
 import http from 'http';
+import cookie from 'cookie';
 
 import {ReduxRouter} from 'redux-router';
 import createHistory from 'history/lib/createMemoryHistory';
@@ -19,9 +20,9 @@ import {Provider} from 'react-redux';
 import qs from 'query-string';
 import getRoutes from './routes';
 import getStatusFromRoutes from './helpers/getStatusFromRoutes';
+import { setToken } from 'redux/modules/currentUser';
 
 const targetUrl = 'http://' + config.apiHost + ':' + config.apiPort;
-console.log('here', targetUrl);
 const pretty = new PrettyError();
 const app = new Express();
 const server = new http.Server(app);
@@ -63,6 +64,14 @@ app.use((req, res) => {
   const client = new ApiClient(req);
 
   const store = createStore(reduxReactRouter, getRoutes, createHistory, client);
+
+  if (req.get('cookie')) {
+    const token = cookie.parse(req.get('cookie')).token;
+    if (token) {
+      store.dispatch(setToken(token));
+    }
+  }
+
 
   function hydrateOnClient() {
     res.send('<!doctype html>\n' +

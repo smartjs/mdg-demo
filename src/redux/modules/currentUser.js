@@ -1,6 +1,7 @@
 const LOGIN = 'mdg/currentUser/LOGIN';
-const LOGIN_SUCCESS = 'mdg/currentUser/LOGIN_SUCCESS';
+export const LOGIN_SUCCESS = 'mdg/currentUser/LOGIN_SUCCESS';
 const LOGIN_FAIL = 'mdg/currentUser/LOGIN_FAIL';
+const SET_TOKEN = 'mdg/currentUser/SET_TOKEN';
 
 const initialState = {
   token: null
@@ -18,6 +19,12 @@ export default function(state = initialState, action) {
         ...state,
         loading: false,
         token: action.result.token,
+      };
+    }
+    case SET_TOKEN: {
+      return {
+        ...state,
+        token: action.token,
       };
     }
     case LOGIN_FAIL: {
@@ -38,5 +45,12 @@ export function login({ username, password}) {
     promise: (client) => client.post('/login', {
       data: { username, password }
     }),
+  };
+}
+
+export function setToken(token) {
+  return {
+    type: SET_TOKEN,
+    token
   };
 }
