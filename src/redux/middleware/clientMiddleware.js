@@ -12,6 +12,12 @@ export default function clientMiddleware(client) {
 
       const [REQUEST, SUCCESS, FAILURE] = types;
       next({...rest, type: REQUEST});
+
+      const { token } = getState().currentUser;
+      if (token) {
+        client.setAuthorization(token);
+      }
+
       return promise(client).then(
         (result) => next({...rest, result, type: SUCCESS}),
         (error) => next({...rest, error, type: FAILURE})

@@ -1,10 +1,11 @@
 import React, { Component, PropTypes } from 'react';
-const { object, func, string } = PropTypes;
+const { object, func, string, array } = PropTypes;
 import { connect } from 'react-redux';
 
 import connectData from 'helpers/connectData';
 
 import { login } from 'redux/modules/currentUser';
+import { load as loadSurveys } from 'redux/modules/surveys';
 
 function fetchData() {
   return Promise.resolve();
@@ -12,15 +13,22 @@ function fetchData() {
 
 @connectData(fetchData)
 @connect(
-  ({ currentUser }) => ({ token: currentUser.token }),
-  { login }
+  ({ currentUser, surveys }) => ({ token: currentUser.token, surveys: surveys.list }),
+  { login, loadSurveys }
 )
 export default class App extends Component {
   static propTypes = {
-    children: object.isRequired,
     login: func.isRequired,
+    loadSurveys: func.isRequired,
+    surveys: array.isRequired,
     token: string,
   };
+
+  componentWillReceiveProps(newProps) {
+    if (!this.props.token && newProps.token) {
+      this.props.loadSurveys();
+    }
+  }
 
 
   handleLogin = () => {
@@ -31,11 +39,18 @@ export default class App extends Component {
   };
 
   render() {
-    const { token } = this.props;
+    const { token, surveys } = this.props;
     return (
       <div>
         { token }
-        <button onClick={this.handleLogin}>Login</button>
+        { !token ? <button onClick={this.handleLogin}>Login</button> : null }
+        { surveys.length ?
+          (
+            <ul>
+              { surveys.map(({ title, _id }) => <li key={_id}>{title}</li>) }
+            </ul>
+          ) : null
+        }
       </div>
     );
   }

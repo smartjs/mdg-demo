@@ -29,6 +29,10 @@ class _ApiClient {
           request.query(params);
         }
 
+        if (this.token) {
+          request.set('Authorization', `Bearer ${this.token}`);
+        }
+
         if (__SERVER__ && req.get('cookie')) {
           request.set('cookie', req.get('cookie'));
         }
@@ -39,6 +43,10 @@ class _ApiClient {
 
         request.end((err, { body } = {}) => err ? reject(body || err) : resolve(body));
       }));
+  }
+
+  setAuthorization(token) {
+    this.token = token;
   }
 }
 
