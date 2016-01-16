@@ -1,30 +1,42 @@
 import React, { Component, PropTypes } from 'react';
+const { object, func, string } = PropTypes;
 import { connect } from 'react-redux';
-import { IndexLink } from 'react-router';
-import { LinkContainer } from 'react-router-bootstrap';
-import { Navbar, Nav, NavItem } from 'react-bootstrap';
-import Helmet from 'react-helmet';
-import connectData from 'helpers/connectData';
-import config from '../../config';
 
-function fetchData(getState, dispatch) {
-  return Promise.resolve()
+import connectData from 'helpers/connectData';
+
+import { login } from 'redux/modules/currentUser';
+
+function fetchData() {
+  return Promise.resolve();
 }
 
 @connectData(fetchData)
+@connect(
+  ({ currentUser }) => ({ token: currentUser.token }),
+  { login }
+)
 export default class App extends Component {
   static propTypes = {
-    children: PropTypes.object.isRequired,
-    pushState: PropTypes.func.isRequired
+    children: object.isRequired,
+    login: func.isRequired,
+    token: string,
   };
 
-  static contextTypes = {
-    store: PropTypes.object.isRequired
+
+  handleLogin = () => {
+    this.props.login({
+      username: 'Enjeru',
+      password: 'cTF3MmUzcjQ=',
+    });
   };
 
   render() {
-    const styles = require('./App.scss');
-
-    return <div>Hello!</div>;
+    const { token } = this.props;
+    return (
+      <div>
+        { token }
+        <button onClick={this.handleLogin}>Login</button>
+      </div>
+    );
   }
 }
